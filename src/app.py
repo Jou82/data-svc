@@ -7,6 +7,7 @@ from src.utils.json_provider import AppJSONProvider
 from src.routes.usuarios import usuarios_bp
 from src.routes.comprovantes import comprovantes_bp
 from src.routes.agendamentos import agendamentos_bp
+from src.routes.lembretes import lembretes_bp
 from src.routes.listas import listas_bp
 from src.routes.contas import contas_bp
 from src.routes.agente import agente_bp
@@ -38,6 +39,7 @@ def create_app() -> Flask:
     app.register_blueprint(usuarios_bp)
     app.register_blueprint(comprovantes_bp)
     app.register_blueprint(agendamentos_bp)
+    app.register_blueprint(lembretes_bp)
     app.register_blueprint(listas_bp)
     app.register_blueprint(contas_bp)
     app.register_blueprint(agente_bp)
