@@ -82,6 +82,7 @@ CREATE TABLE public.agendamentos (
   status            text          DEFAULT 'pendente'
                     CHECK (status IN ('pendente', 'confirmado', 'agendado', 'cancelado')),
   lembrete_enviado  boolean       DEFAULT false,  -- atualizado pelo workflow Lembretes automaticos
+  lembrete_minutos_antes integer  DEFAULT 15,
   data_lembrete     timestamp,
   tipo_agendamento  varchar(20)   DEFAULT 'unico',
   recorrencia_id    uuid,

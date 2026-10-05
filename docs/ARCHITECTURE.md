@@ -136,6 +136,15 @@ Todas as rotas exigem o header `X-Api-Key` quando `API_KEY` está configurada (v
 | DELETE | `/usuarios/<id>/agendamentos` | Cancela todos os agendamentos do usuário | — |
 | DELETE | `/usuarios/<id>/agendamentos/recorrencia/<recorrencia_id>` | Cancela uma série recorrente | — |
 
+### `lembretes` — `src/routes/lembretes.py` (cron n8n)
+
+| Método | Path | Propósito | Params / body |
+|--------|------|-----------|----------------|
+| GET | `/lembretes/due` | Agendamentos na janela de lembrete (TZ `America/Sao_Paulo`, default ±2 min) | query `window_minutes` (0–10, default 2) |
+| POST | `/lembretes/<agendamento_id>/enviado` | Marca `lembrete_enviado=true` após Z-API ok (idempotente) | — |
+
+Auth: header `X-API-Key` (mesmo contrato das demais rotas internas). Retry: `run_db_with_retry` (3 tentativas, backoff) em falha `OperationalError`.
+
 ### `listas` — `src/routes/listas.py`
 
 | Método | Path | Propósito | Body/params |
