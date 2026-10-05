@@ -121,6 +121,15 @@ def busca_rag():
                 f"[rag] upstash ok: perfil={perfil} source_prefix={source_prefix} "
                 f"resultados={len(resultados)}"
             )
+            # Índice Upstash pode estar sem knowledge_duvidas_pl (prod 2026-10-03:
+            # source_prefix + perfil=pl → 0 hits). Degrada pro pgvector em vez de
+            # 200 vazio silencioso — o agente Dúvidas PL alucinava sem base.
+            if not resultados and source_prefix:
+                print(
+                    f"[rag] upstash vazio com source_prefix={source_prefix}, "
+                    "caindo no pgvector"
+                )
+                resultados = None
         except vector.VectorIndisponivel as e:
             # degrada para o pgvector em vez de 500 ou lista vazia. O log é
             # obrigatório: fallback mudo faz a Upstash parecer saudável enquanto
