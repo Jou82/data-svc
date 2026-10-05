@@ -220,6 +220,34 @@ class TestBackendUpstash:
 
         assert "resultados=0" in capsys.readouterr().out
 
+    def test_upstash_vazio_com_source_prefix_cai_no_pgvector(
+        self, client, mock_db_conn, mocker, capsys
+    ):
+        # prod 2026-10-03: Upstash sem knowledge_duvidas_pl → 0 hits com
+        # source_prefix; Dúvidas PL alucinava. Fallback pro Postgres.
+        self._preparar(mocker)
+        mock_db_conn("src.routes.rag.get_db_conn")
+        mocker.patch("src.routes.rag.vector.busca_semantica", return_value=[])
+        pg = mocker.patch(
+            "src.routes.rag.queries.busca_semantica",
+            return_value=[{"id": 9, "content": "INSS PL", "similarity": 0.55}],
+        )
+
+        r = client.post(
+            "/rag/busca",
+            json={
+                "pergunta": "como contribuo INSS?",
+                "perfil": "pl",
+                "source_prefix": "knowledge_duvidas",
+            },
+        )
+
+        assert r.status_code == 200
+        assert pg.called
+        assert r.get_json()["resultados"][0]["content"] == "INSS PL"
+        out = capsys.readouterr().out
+        assert "upstash vazio com source_prefix" in out
+
     def test_pgvector_nao_loga_por_requisicao(self, client, mock_db_conn, mocker, capsys):
         # o caminho default serve 100% do tráfego hoje; logar cada request só
         # encheria o stdout do Easypanel. O log existe para observar o cutover.
@@ -378,7 +406,11 @@ class TestSourcePrefixFilter:
     def test_source_prefix_na_upstash(self, client, mock_db_conn, mocker):
         self._preparar(mocker, backend="upstash")
         mock_db_conn("src.routes.rag.get_db_conn")
-        up = mocker.patch("src.routes.rag.vector.busca_semantica", return_value=[])
+        # Hit não-vazio: lista vazia com source_prefix cai no pgvector (outro teste).
+        up = mocker.patch(
+            "src.routes.rag.vector.busca_semantica",
+            return_value=[{"id": 1, "content": "DAS fiscal", "similarity": 0.6}],
+        )
 
         client.post("/rag/busca", json={
             "pergunta": "DAS?",
@@ -582,6 +614,34 @@ class TestTypeSafeRagScore:
             client_factory=lambda: BoomClient(),
         )
         assert out == chunks  # fail-open: lista embedding intacta
+
+    def test_filter_fail_open_empty_keep(self, mocker):
+        from src.typesafe import rag_passages
+
+        mocker.patch.object(Config, "TYPESAFE_RAG_SCORE", True)
+        mocker.patch.object(Config, "TYPESAFE_API_KEY", "test-key")
+        mocker.patch.object(Config, "TYPESAFE_RAG_RELEVANT_MIN", 0.45)
+        mocker.patch.object(Config, "TYPESAFE_RAG_EVIDENCE_MIN", 0.55)
+        mocker.patch.object(Config, "TYPESAFE_RAG_INJECTION_MAX", 0.70)
+
+        chunks = [
+            {"id": 1, "content": "plano Meirelles", "similarity": 0.9},
+            {"id": 2, "content": "cardápio", "similarity": 0.8},
+        ]
+        # Todos abaixo do corte → anti-vazio devolve topK embedding.
+        scores = {
+            1: (0.2, 0.2, 0.1),
+            2: (0.1, 0.1, 0.1),
+        }
+        client = _FakeTypeSafeClient(scores)
+
+        out = rag_passages.filter_passages(
+            "quando vence o das?",
+            chunks,
+            client_factory=lambda: client,
+        )
+        assert out == chunks
+        assert client.calls == 2
 
     def test_filter_flag_off_ou_sem_key_devolve_igual(self, mocker):
         from src.typesafe import rag_passages
