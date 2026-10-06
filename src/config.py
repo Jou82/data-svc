@@ -69,6 +69,10 @@ class Config:
     TYPESAFE_RAG_EVIDENCE_MIN: float = float(os.getenv("TYPESAFE_RAG_EVIDENCE_MIN", "0.55"))
     TYPESAFE_RAG_INJECTION_MAX: float = float(os.getenv("TYPESAFE_RAG_INJECTION_MAX", "0.70"))
 
+    # Discord Incoming Webhook (ops). Vazio = alertas desligados (fail-open).
+    # Em prod: mesmo URL do n8n `N8N_ERROR_WEBHOOK_URL` (Easypanel), sem versionar.
+    DISCORD_ALERT_WEBHOOK_URL: str = (os.getenv("DISCORD_ALERT_WEBHOOK_URL") or "").strip()
+
     @classmethod
     def validate(cls) -> None:
         if cls.FLASK_ENV == "production" and cls.API_KEY is None:

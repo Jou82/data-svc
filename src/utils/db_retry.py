@@ -10,6 +10,8 @@ from typing import TypeVar
 
 import psycopg2
 
+from src.utils.discord_alert import send_discord_alert
+
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
@@ -44,4 +46,10 @@ def run_db_with_retry(
             )
             time.sleep(delay)
     assert last_exc is not None
+    # Retry esgotado: avisa Discord (fail-open) e propaga — n8n ainda vê o 5xx.
+    send_discord_alert(
+        source="data-svc",
+        reason=f"db_retry esgotado op=`{operation}` ({max_attempts}/{max_attempts})",
+        detail=f"{type(last_exc).__name__}: {last_exc}",
+    )
     raise last_exc
