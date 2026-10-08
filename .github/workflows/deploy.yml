@@ -1,8 +1,11 @@
 name: Deploy to Cloud Run (réplica GCP)
 
+# Réplica GCP não é produção (Easypanel/VPS é a fonte de verdade).
+# WIF ainda aponta para o repo antigo — até atualizar a attribute condition
+# para Jou82/data-svc, o deploy automático só gera falha vermelha na main.
+# Disparar manualmente quando a réplica for usada de novo:
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 env:
   REGION: us-west1
