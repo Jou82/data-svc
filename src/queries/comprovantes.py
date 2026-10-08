@@ -240,6 +240,10 @@ def list_recentes(conn, usuario_id: int, limit: int = 10) -> list[dict]:
         return [dict(row) for row in cursor.fetchall()]
 
 
+
+# Alias usado pelas rotas GET /comprovantes/ultimo?limit=
+get_ultimos = list_recentes
+
 def get_livro_caixa(conn, usuario_id: int, mes: str) -> dict:
     """Agrega dados do livro de caixa para um mês específico."""
     params = {

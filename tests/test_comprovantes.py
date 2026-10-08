@@ -142,9 +142,10 @@ class TestCreateComprovante:
         assert upsert_args[1] == usuario_id
         assert upsert_args[2]["operacao"] == "venda"
         assert upsert_args[2]["item_hash"] == payload["item_hash"]
-        assert invalidate_prefix_mock.call_count == 2
+        assert invalidate_prefix_mock.call_count == 3
         invalidate_prefix_mock.assert_any_call("saldo", f"{usuario_id}:")
         invalidate_prefix_mock.assert_any_call("comprovantes", f"{usuario_id}:")
+        invalidate_prefix_mock.assert_any_call("comprovantes_ultimo", f"{usuario_id}")
 
     def test_atualiza_comprovante_existente_por_item_hash(self, client, mock_db_conn, mocker):
         usuario_id = 1
@@ -225,9 +226,10 @@ class TestCreateComprovante:
         resp = client.post(f"/usuarios/{usuario_id}/comprovantes", json=payload)
 
         assert resp.status_code == 200
-        assert invalidate_prefix_mock.call_count == 2
+        assert invalidate_prefix_mock.call_count == 3
         invalidate_prefix_mock.assert_any_call("saldo", f"{usuario_id}:")
         invalidate_prefix_mock.assert_any_call("comprovantes", f"{usuario_id}:")
+        invalidate_prefix_mock.assert_any_call("comprovantes_ultimo", f"{usuario_id}")
 
     def test_passa_canal_venda_para_upsert(self, client, mock_db_conn, mocker):
         usuario_id = 1

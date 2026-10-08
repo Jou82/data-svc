@@ -79,8 +79,9 @@ def create_comprovante(usuario_id: int):
     with get_db_conn() as conn:
         comprovante = q.upsert(conn, usuario_id, body)
 
-        cache_invalidate_prefix("saldo", f"{usuario_id}:")
-        cache_invalidate_prefix("comprovantes", f"{usuario_id}:")
+        # Inclui comprovantes_ultimo — senão GET /ultimo?limit=N serve lista stale
+        # e "foi X" edita o lançamento errado (pool[0] velho).
+        _invalidar_cache_comprovantes(usuario_id)
 
         return ok(200, comprovante)
 
