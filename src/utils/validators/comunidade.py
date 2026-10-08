@@ -13,7 +13,7 @@ _CATEGORIAS_SERVICO: Final[set[str]] = {
     # PL / conselho — estavam faltando e o seed já os usa; sem eles o ranking
     # devolvia 400 e a matriz de complementaridade PL do prompt era inalcançável.
     "advogado", "contador", "dentista", "fisioterapeuta", "nutricionista",
-    "psicologo", "personal_trainer",
+    "psicologo", "personal_trainer", "enfermeiro",
 }
 
 
