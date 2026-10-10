@@ -133,7 +133,8 @@ def upsert(conn, usuario_id: int, data: dict) -> dict:
             atendido_cpf  = COALESCE(EXCLUDED.atendido_cpf, public.comprovantes.atendido_cpf),
             natureza_pagamento = COALESCE(EXCLUDED.natureza_pagamento, public.comprovantes.natureza_pagamento)
         RETURNING id, operacao, item, valor_total, data_compra, data_venda, canal_venda,
-                  pagador_nome, pagador_cpf, atendido_nome, atendido_cpf, natureza_pagamento;
+                  pagador_nome, pagador_cpf, atendido_nome, atendido_cpf, natureza_pagamento,
+                  (xmax = 0) AS inserted;
     """
     with conn.cursor(cursor_factory=RealDictCursor) as cursor:
         cursor.execute(sql, params)
