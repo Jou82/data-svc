@@ -19,6 +19,7 @@ class Config:
     CACHE_TTL_LISTAS: int = int(os.getenv("CACHE_TTL_LISTAS", 300))
     CACHE_TTL_FEEDBACKS: int = int(os.getenv("CACHE_TTL_FEEDBACKS", 300))
     CACHE_TTL_CONTEXTO_BUSINESS: int = int(os.getenv("CACHE_TTL_CONTEXTO_BUSINESS", 60))
+    CACHE_TTL_PARAMETROS_FISCAIS: int = int(os.getenv("CACHE_TTL_PARAMETROS_FISCAIS", 3600))
 
     # Cache L2 distribuído (Upstash Redis REST) — não-fatal, Postgres é fonte da verdade.
     # Vazio = desativado (wrapper vira no-op). Uma DB free serve STG+PRD via prefixo.

@@ -19,6 +19,7 @@ from src.routes.business import business_bp
 from src.routes.oauth import oauth_bp
 from src.routes.comunidade import comunidade_bp
 from src.routes.inbox import inbox_bp
+from src.routes.parametros_fiscais import parametros_fiscais_bp
 
 
 def create_app() -> Flask:
@@ -51,5 +52,6 @@ def create_app() -> Flask:
     app.register_blueprint(oauth_bp)
     app.register_blueprint(comunidade_bp)
     app.register_blueprint(inbox_bp)
+    app.register_blueprint(parametros_fiscais_bp)
 
     return app
