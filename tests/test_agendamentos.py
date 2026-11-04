@@ -109,7 +109,8 @@ class TestCreateAgendamento:
 
         assert resp.status_code == 201
         assert resp.get_json() == agendamento_fake
-        create_mock.assert_called_once_with(conn, usuario_id, payload)
+        # O validador preenche o default de lembrete (15 min) antes de chamar q.create.
+        create_mock.assert_called_once_with(conn, usuario_id, {**payload, "lembrete_minutos_antes": 15})
         invalidate_prefix_mock.assert_called_once_with("agendamentos", f"{usuario_id}:")
 
     def test_retorna_400_sem_campos_obrigatorios(self, client):
