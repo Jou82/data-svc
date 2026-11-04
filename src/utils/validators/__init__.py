@@ -25,11 +25,14 @@ from .listas import (
     validate_lista_delete_itens_payload,
     validate_lista_itens_payload,
 )
+from .parametros_fiscais import ParametroFiscalInvalido, validate_parametros_fiscais_query
 from .usuarios import validate_telefone, validate_usuario_agenda_fields
 from .validators import require_fields
 
 __all__ = [
+    "ParametroFiscalInvalido",
     "require_fields",
+    "validate_parametros_fiscais_query",
     "validate_agendamento_payload",
     "validate_bairro_lookup_params",
     "validate_cancelamento_payload",
